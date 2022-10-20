@@ -162,10 +162,9 @@ func cd(args []string) int {
 // built-in help command
 func help(args []string) int {
 
-	Print("\tgoshell" +
-		  "Simple shell written in go\n" +
+	Print("goshell: simple shell written in go\n" +
 		  "Type program names and arguments, and hit enter\n" +
-		  "\nThe following are built-in:\n")
+		  "\nThe following commands are built-in:\n")
 
 	for i := 0; i < numBuiltins(); i++ {
 		Println("\t", builtInStr[i])
