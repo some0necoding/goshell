@@ -136,7 +136,7 @@ func cd(args []string) int {
 		Println("ghs: expected argument to \"cd\"")
 		return 1
 	} else {
-		// call to c chdir(args[1]) function
+		os.Chdir(args[1])
 	}
 
 	return 0
@@ -146,18 +146,18 @@ func help(args []string) int {
 
 	Print("GSH: a simple shell written in go\n" +
 		"Type program names and arguments, and hit enter\n" +
-		"The following are built-in:\n")
+		"\nThe following are built-in:\n")
 
 	for i := 0; i < numBuiltins(); i++ {
-		Println(builtInStr[i])
+		Println("\t", builtInStr[i])
 	}
 
-	Println("Use the man command for informations about other programs.")
+	Println("\nUse the man command for informations about other programs.")
 	return 0
 }
 
 func exit(args []string) int {
-	return 0
+	return 1
 }
 
 /*
