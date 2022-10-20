@@ -5,7 +5,7 @@ Download:
 ```
 git clone https://github.com/some0necoding/goshell.git
 
-cd goshell
+cd goshell/main
 
 go build shell.c -o shell
 
