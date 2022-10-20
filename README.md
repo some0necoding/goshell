@@ -1,2 +1,4 @@
 # goshell
-really simple unix shell written in go
+Really simple unix shell written in go
+
+How to download:
