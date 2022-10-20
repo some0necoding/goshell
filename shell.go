@@ -4,8 +4,8 @@ import (
 	"bufio"
 	. "fmt"
 	"os"
+	"os/exec"
 	"strings"
-	"syscall"
 )
 
 type builtInFunc func([]string) int
@@ -88,43 +88,27 @@ func numBuiltins() int {
 
 func launch(args []string) int {
 
-	pid, _, _ := syscall.Syscall(syscall.SYS_FORK, 0, 0, 0)
-
-	if pid == 0 {
-
-		err := syscall.Exec(args[0], args, os.Environ())
-
-		if err != nil {
-			return -1
-		}
-
-	} else if pid < 0 {
-		return -1
-	} else {
-
-		var status syscall.WaitStatus
-
-		for !status.Exited() && !status.Signaled() {
-
-			process, err := os.FindProcess(int(pid))
-
-			if err == nil {
-
-				processState, err := process.Wait()
-
-				if err == nil {
-					status = processState.Sys().(syscall.WaitStatus)
-				} else {
-					return -1
-				}
-
-			} else {
-				return -1
-			}
-		}
+	if process, err := Start(args); err == nil {
+		process.Wait()
 	}
 
 	return 0
+}
+
+func Start(args []string) (process *os.Process, err error) {
+
+	if args[0], err = exec.LookPath(args[0]); err == nil {
+
+		process, err := os.StartProcess(args[0], args, &os.ProcAttr{
+			Files: []*os.File{os.Stdin, os.Stdout, os.Stderr},
+		})
+
+		if err == nil {
+			return process, nil
+		}
+	}
+
+	return nil, err
 }
 
 /*
