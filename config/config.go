@@ -7,7 +7,7 @@ import (
 
 func Prompt() string {
 
-	var prompt string
+	prompt := "[marco "
 	
 	if fullPath, err := os.Getwd(); err == nil {
 
@@ -23,7 +23,7 @@ func Prompt() string {
 		prompt += workingDir
 	}
 
-	prompt += "$ "
+	prompt += "]$ "
 
 	return prompt
 }

@@ -9,14 +9,17 @@ import (
 	"shell/config"
 )
 
+// custom type for builtin functions
 type builtInFunc func([]string) int
 
+// builtin functions' names
 var builtInStr = []string{
 	"cd",
 	"help",
 	"exit",
 }
 
+// builtin functions
 var builtInFuncs = []builtInFunc{
 	cd,
 	help,
@@ -27,7 +30,7 @@ var prompt string
 
 func main() {
 
-	prompt = config.Prompt()
+	// config files
 
 	loop()
 
@@ -39,9 +42,12 @@ func loop() {
 	status := 0
 
 	for status == 0 {
-		
+	
+		// generating prompt
 		prompt = config.Prompt()
+
 		Print(prompt)
+		
 		line, err := readLine()
 
 		if err == 0 {
@@ -53,18 +59,16 @@ func loop() {
 
 func readLine() (string, int) {
 
-	var userInput string
-
 	stdin := bufio.NewReader(os.Stdin)
-	userInput, err := stdin.ReadString('\n')
-
-	if err != nil {
-		return "", -1
+	
+	if userInput, err := stdin.ReadString('\n'); err == nil {
+		lastIndex := len(userInput)	- 1
+		
+		// returning user input without trailing "\n"
+		return userInput[:lastIndex], 0
 	}
-
-	lastIndex := len(userInput) - 1
-
-	return userInput[:lastIndex], 0
+	
+	return "", -1
 }
 
 func splitLine(line string) []string {
@@ -73,10 +77,12 @@ func splitLine(line string) []string {
 
 func execute(args []string) int {
 
+	// checking for empty commands
 	if args[0] == "" {
 		return -1
 	}
 
+	// checking for built-in commands
 	for i := 0; i < numBuiltins(); i++ {
 		if args[0] == builtInStr[i] {
 			function := builtInFuncs[i]
@@ -84,15 +90,19 @@ func execute(args []string) int {
 		}
 	}
 
+	// otherwise launch the non built-in command
 	return launch(args)
 }
 
+// returns number of built-in commands
 func numBuiltins() int {
 	return len(builtInStr)
 }
 
+// launches non built-in commands
 func launch(args []string) int {
 
+	// starts the command and waits for it to finish
 	if process, err := Start(args); err == nil {
 		process.Wait()
 	}
@@ -100,10 +110,13 @@ func launch(args []string) int {
 	return 0
 }
 
+// starts a new process
 func Start(args []string) (process *os.Process, err error) {
 
+	// checking for command existance
 	if args[0], err = exec.LookPath(args[0]); err == nil {
 
+		// starting the new process
 		process, err := os.StartProcess(args[0], args, &os.ProcAttr{
 			Files: []*os.File{os.Stdin, os.Stdout, os.Stderr},
 		})
@@ -111,6 +124,7 @@ func Start(args []string) (process *os.Process, err error) {
 		if err == nil {
 			return process, nil
 		}
+
 	} else {
 		Println("gsh: command not found")
 	}
@@ -122,7 +136,10 @@ func Start(args []string) (process *os.Process, err error) {
 	BUILT-IN FUNCTION DECLARATION START
 */
 
+// built-in cd command
 func cd(args []string) int {
+
+	// checking for bad args
 	if args[1] == "" {
 		Println("gsh: expected argument to \"cd\"")
 		return 1
@@ -135,17 +152,20 @@ func cd(args []string) int {
 			}
 		}
 
+		// making system call
 		os.Chdir(args[1])
 	}
 
 	return 0
 }
 
+// built-in help command
 func help(args []string) int {
 
-	Print("GSH: a simple shell written in go\n" +
-		"Type program names and arguments, and hit enter\n" +
-		"\nThe following are built-in:\n")
+	Print("\tgoshell" +
+		  "Simple shell written in go\n" +
+		  "Type program names and arguments, and hit enter\n" +
+		  "\nThe following are built-in:\n")
 
 	for i := 0; i < numBuiltins(); i++ {
 		Println("\t", builtInStr[i])
@@ -155,6 +175,7 @@ func help(args []string) int {
 	return 0
 }
 
+// built-in exit command
 func exit(args []string) int {
 	return 1
 }
