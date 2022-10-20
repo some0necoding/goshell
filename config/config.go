@@ -7,8 +7,15 @@ import (
 
 func Prompt() string {
 
-	prompt := "[marco "
-	
+	prompt := "["
+	user := os.Getenv("USER")
+
+	if hostname, err := os.Hostname(); err == nil {
+		prompt += hostname + "@"
+	}
+
+	prompt += user + " "
+
 	if fullPath, err := os.Getwd(); err == nil {
 
 		var workingDir string
