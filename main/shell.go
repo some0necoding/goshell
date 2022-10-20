@@ -6,6 +6,7 @@ import (
 	"os"
 	"os/exec"
 	"strings"
+	"shell/config"
 )
 
 type builtInFunc func([]string) int
@@ -22,9 +23,11 @@ var builtInFuncs = []builtInFunc{
 	exit,
 }
 
+var prompt string
+
 func main() {
 
-	// load config files
+	prompt = config.Prompt()
 
 	loop()
 
@@ -36,7 +39,9 @@ func loop() {
 	status := 0
 
 	for status == 0 {
-		Print("> ")
+		
+		prompt = config.Prompt()
+		Print(prompt)
 		line, err := readLine()
 
 		if err == 0 {
@@ -106,6 +111,8 @@ func Start(args []string) (process *os.Process, err error) {
 		if err == nil {
 			return process, nil
 		}
+	} else {
+		Println("gsh: command not found")
 	}
 
 	return nil, err
@@ -117,9 +124,17 @@ func Start(args []string) (process *os.Process, err error) {
 
 func cd(args []string) int {
 	if args[1] == "" {
-		Println("ghs: expected argument to \"cd\"")
+		Println("gsh: expected argument to \"cd\"")
 		return 1
 	} else {
+
+		// "~" shortcut to /home/user directory
+		if args[1] == "~" {
+			if homeDir, err := os.UserHomeDir(); err == nil {
+				args[1] = homeDir
+			}
+		}
+
 		os.Chdir(args[1])
 	}
 
