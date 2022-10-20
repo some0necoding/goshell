@@ -1,5 +1,5 @@
 # goshell
-Really simple unix shell written in go
+Really simple unix shell written in go (it really doesn't do anything but running programs)
 
 Download:
 ```
