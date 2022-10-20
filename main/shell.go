@@ -164,7 +164,7 @@ func help(args []string) int {
 
 	Print("goshell: simple shell written in go\n" +
 		  "Type program names and arguments, and hit enter\n" +
-		  "\n The following commands are built-in:\n")
+		  "\nThe following commands are built-in:\n")
 
 	for i := 0; i < numBuiltins(); i++ {
 		Println("\t", builtInStr[i])
