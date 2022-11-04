@@ -9,6 +9,6 @@ cd goshell/main
 
 go build -o shell shell.c
 
-sudo mv shell /usr/bin
+sudo mv shell /usr/local/bin
 ```
 I suggest to not use it as it really sucks :)
