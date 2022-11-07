@@ -7,7 +7,7 @@ git clone https://github.com/some0necoding/goshell.git
 
 cd goshell/main
 
-go build -o shell shell.go
+go build -o goshell shell.go
 
 sudo mv shell /usr/local/bin
 ```
