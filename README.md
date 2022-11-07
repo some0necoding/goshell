@@ -11,4 +11,4 @@ go build -o shell shell.c
 
 sudo mv shell /usr/local/bin
 ```
-I suggest to not use it as it cannot yet interpret quoted text as a single string
+I suggest to not use it as it cannot yet interpret quoted text as a single string ;)
