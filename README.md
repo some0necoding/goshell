@@ -9,6 +9,6 @@ cd goshell/main
 
 go build -o goshell shell.go
 
-sudo mv shell /usr/local/bin
+sudo mv goshell /usr/local/bin
 ```
 I suggest to not use it as it cannot yet interpret quoted text as a single string ;)
