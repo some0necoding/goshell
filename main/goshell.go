@@ -79,7 +79,7 @@ func execute(args []string) int {
 
 	// checking for empty commands
 	if args[0] == "" {
-		return -1
+		return 0
 	}
 
 	// checking for built-in commands
