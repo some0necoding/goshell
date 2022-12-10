@@ -113,7 +113,7 @@ func launch(args []string) int {
 // starts a new process
 func Start(args []string) (process *os.Process, err error) {
 
-	// checking for command existance
+	// checking for command existence
 	if args[0], err = exec.LookPath(args[0]); err == nil {
 
 		// starting the new process
