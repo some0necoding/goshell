@@ -133,7 +133,7 @@ func Start(args []string) (process *os.Process, err error) {
 }
 
 /*
-	BUILT-IN FUNCTION DECLARATION START
+	BUILT-IN FUNCTIONS DECLARATION START
 */
 
 // built-in cd command
@@ -180,5 +180,5 @@ func exit(args []string) int {
 }
 
 /*
- BUILT-IN FUNCTION DECLARATION END
+ BUILT-IN FUNCTIONS DECLARATION END
 */
