@@ -2,11 +2,12 @@ package main
 
 import (
 	"bufio"
+	"errors"
 	. "fmt"
 	"os"
 	"os/exec"
-	"shell/config"
 	"shell/builtins"
+	"shell/config"
 	"strings"
 )
 
@@ -37,12 +38,19 @@ func loop() (status error) {
 		var line string
 
 		Print(prompt)
-		line, status = readLine()
+		line, err := readLine()
 
-		if status == nil {
-			args := strings.Split(line, " ")
-			status = execute(args)
+		if err != nil {
+			continue
 		}
+
+		args, err := splitLine(line)
+
+		if err != nil {
+			continue
+		}
+			
+		status = execute(args)
 	}
 
 	return
@@ -57,6 +65,29 @@ func readLine() (line string, err error) {
 	}
 	
 	return "", err
+}
+
+func splitLine(line string) (args []string, err error) {
+
+	if strings.Count(line, "\"") % 2 == 1 {
+		Println("gsh: missing \"")
+		return args, errors.New("Bad formatting")
+	} 
+
+	tokens := strings.Split(line, "\"")
+
+	for i, token := range tokens {
+		
+		token = strings.TrimSpace(token)
+
+		if i % 2 == 1 {
+			args = append(args, token)
+		} else {
+			args = append(args, strings.Split(token, " ")...)
+		}
+	}
+
+	return args, nil
 }
 
 func execute(args []string) (err error) {
