@@ -2,11 +2,11 @@ package main
 
 import (
 	"bufio"
-	"errors"
 	. "fmt"
 	"os"
 	"os/exec"
 	"shell/config"
+	"shell/builtins"
 	"strings"
 )
 
@@ -14,9 +14,9 @@ import (
 type builtInFunc func([]string) error
 
 var builtInFuncs = map[string]builtInFunc {
-	"cd": cd,
-	"help": help,
-	"exit": exit, 
+	"cd": builtins.Cd,
+	"help": builtins.Help,
+	"exit": builtins.Exit, 
 }
 
 func main() {
@@ -34,11 +34,12 @@ func loop() {
 	prompt := config.Prompt()
 
 	for status == nil {
-	
+
 		Print(prompt)
-		line, status := readLine()
-		
-		if status == nil {
+		line, err := readLine()
+		status = err
+
+		if err == nil {
 			args := strings.Split(line, " ")
 			status = execute(args)
 		}
@@ -104,41 +105,3 @@ func Start(args []string) (process *os.Process, err error) {
 
 	return nil, err
 }
-
-/*
-	BUILT-IN FUNCTIONS DECLARATION START
-*/
-
-/* cd command */
-func cd(args []string) (err error) {
-
-	/* "~" shortcut to /home/user directory */
-	if args[1] == "~" || args[1] == "" {
-		if homeDir, err := os.UserHomeDir(); err == nil {
-			args[1] = homeDir
-		}
-	}
-
-	os.Chdir(args[1])
-
-	return nil
-}
-
-/* help command */
-func help(args []string) (err error) {
-
-	Print("goshell: simple shell written in go\n" +
-		  "Type program names and arguments, and hit enter.\n" +
-		  "Use the man command for informations about programs.\n")
-
-	return nil
-}
-
-/* exit command */
-func exit(args []string) (err error) {
-	return errors.New("exit")
-}
-
-/*
-	BUILT-IN FUNCTIONS DECLARATION END
-*/
