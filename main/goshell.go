@@ -13,27 +13,19 @@ import (
 /* Custom type for builtin functions */
 type builtInFunc func([]string) error
 
-/* Builtin functions' names */
-var builtInStr = []string{
-	"cd",
-	"help",
-	"exit",
-}
-
-/* Builtin functions */
-var builtInFuncs = []builtInFunc{
-	cd,
-	help,
-	exit,
+var builtInFuncs = map[string]builtInFunc {
+	"cd": cd,
+	"help": help,
+	"exit": exit, 
 }
 
 func main() {
 
-	// config files
+	/* Config files */
 
 	loop()
 
-	// shutdown / cleanup
+	/* Shutdown / Cleanup */
 }
 
 func loop() {
@@ -69,32 +61,29 @@ func readLine() (line string, err error) {
 
 func execute(args []string) (err error) {
 
-	// checking for empty commands
+	/* Check for empty commands */
 	if args[0] == "" {
 		return nil
 	}
 
-	// checking for built-in commands
-	for i, str := range builtInStr {
-		if args[0] == str {
-			function := builtInFuncs[i]
-			return function(args)
-		}
+	/* Check for built-in commands */
+	if function, ok := builtInFuncs[args[0]]; ok {
+		return function(args)
 	}
 
-	// otherwise launch the non built-in command
+	/* Otherwise launch non built-in command */
 	return launch(args)
 }
 
-// launches non built-in commands
+/* This function launches non built-in commands */
 func launch(args []string) (err error) {
 
-	// starts the command and waits for it to finish
+	/* Start the process and wait until finish */
 	if process, err := Start(args); err == nil {
 		process.Wait()
 	}
 
-	return nil
+	return err
 }
 
 /* Start a new process */
@@ -123,10 +112,10 @@ func Start(args []string) (process *os.Process, err error) {
 	BUILT-IN FUNCTIONS DECLARATION START
 */
 
-// built-in cd command
+/* cd command */
 func cd(args []string) (err error) {
 
-	// "~" shortcut to /home/user directory
+	/* "~" shortcut to /home/user directory */
 	if args[1] == "~" || args[1] == "" {
 		if homeDir, err := os.UserHomeDir(); err == nil {
 			args[1] = homeDir
@@ -138,26 +127,21 @@ func cd(args []string) (err error) {
 	return nil
 }
 
-// built-in help command
+/* help command */
 func help(args []string) (err error) {
 
 	Print("goshell: simple shell written in go\n" +
-		  "Type program names and arguments, and hit enter\n" +
-		  "\nThe following commands are built-in:\n")
+		  "Type program names and arguments, and hit enter.\n" +
+		  "Use the man command for informations about programs.\n")
 
-	for _, str := range builtInStr {
-		Println("\t", str)
-	}
-
-	Println("\nUse the man command for informations about other programs.")
 	return nil
 }
 
-// built-in exit command
+/* exit command */
 func exit(args []string) (err error) {
 	return errors.New("exit")
 }
 
 /*
- BUILT-IN FUNCTIONS DECLARATION END
+	BUILT-IN FUNCTIONS DECLARATION END
 */
