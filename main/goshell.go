@@ -35,11 +35,12 @@ func loop() {
 
 	for status == nil {
 
-		Print(prompt)
-		line, err := readLine()
-		status = err
+		var line string
 
-		if err == nil {
+		Print(prompt)
+		line, status = readLine()
+
+		if status == nil {
 			args := strings.Split(line, " ")
 			status = execute(args)
 		}
