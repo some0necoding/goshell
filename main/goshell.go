@@ -80,7 +80,7 @@ func launch(args []string) (err error) {
 
 	/* Start the process and wait until finish */
 	if process, err := Start(args); err == nil {
-		process.Wait()
+		_, err = process.Wait()
 	}
 
 	return err
