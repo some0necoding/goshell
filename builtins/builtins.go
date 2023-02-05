@@ -17,7 +17,7 @@ func Cd(args []string) (err error) {
 
 	os.Chdir(args[1])
 
-	return nil
+	return err
 }
 
 func Help(args []string) (err error) {
