@@ -93,8 +93,9 @@ func Start(args []string) (process *os.Process, err error) {
 	if args[0], err = exec.LookPath(args[0]); err == nil {
 
 		/* Start the new process */
-		process, err := os.StartProcess(args[0], args, &os.ProcAttr{ 
-			Files: []*os.File{os.Stdin, os.Stdout, os.Stderr}, 
+		process, err := os.StartProcess(args[0], args, &os.ProcAttr{
+			/* Set process files (same as parent) */
+			Files: []*os.File{os.Stdin, os.Stdout, os.Stderr},
 		}) 
 
 		if err == nil {
