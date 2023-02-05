@@ -36,14 +36,11 @@ func loop() {
 	for status == nil {
 	
 		Print(prompt)
+		line, status := readLine()
 		
-		line, err := readLine()
-
-		if err == nil {
+		if status == nil {
 			args := strings.Split(line, " ")
 			status = execute(args)
-		} else {
-			status = err
 		}
 	}
 }
