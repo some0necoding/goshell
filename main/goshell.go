@@ -28,9 +28,8 @@ func main() {
 	/* Shutdown / Cleanup */
 }
 
-func loop() {
+func loop() (status error) {
 
-	var status error
 	prompt := config.Prompt()
 
 	for status == nil {
@@ -45,6 +44,8 @@ func loop() {
 			status = execute(args)
 		}
 	}
+
+	return
 }
 
 func readLine() (line string, err error) {
