@@ -2,31 +2,30 @@ package main
 
 import (
 	"bufio"
+	"errors"
 	. "fmt"
 	"os"
 	"os/exec"
-	"strings"
 	"shell/config"
+	"strings"
 )
 
-// custom type for builtin functions
-type builtInFunc func([]string) int
+/* Custom type for builtin functions */
+type builtInFunc func([]string) error
 
-// builtin functions' names
+/* Builtin functions' names */
 var builtInStr = []string{
 	"cd",
 	"help",
 	"exit",
 }
 
-// builtin functions
+/* Builtin functions */
 var builtInFuncs = []builtInFunc{
 	cd,
 	help,
 	exit,
 }
-
-var prompt string
 
 func main() {
 
@@ -39,52 +38,45 @@ func main() {
 
 func loop() {
 
-	status := 0
+	var status error
+	prompt := config.Prompt()
 
-	for status == 0 {
+	for status == nil {
 	
-		// generating prompt
-		prompt = config.Prompt()
-
 		Print(prompt)
 		
 		line, err := readLine()
 
-		if err == 0 {
-			args := splitLine(line)
+		if err == nil {
+			args := strings.Split(line, " ")
 			status = execute(args)
+		} else {
+			status = err
 		}
 	}
 }
 
-func readLine() (string, int) {
+func readLine() (line string, err error) {
 
 	stdin := bufio.NewReader(os.Stdin)
 	
 	if userInput, err := stdin.ReadString('\n'); err == nil {
-		lastIndex := len(userInput)	- 1
-		
-		// returning user input without trailing "\n"
-		return userInput[:lastIndex], 0
+		return strings.TrimRight(userInput, "\n"), nil
 	}
 	
-	return "", -1
+	return "", err
 }
 
-func splitLine(line string) []string {
-	return strings.Split(line, " ")
-}
-
-func execute(args []string) int {
+func execute(args []string) (err error) {
 
 	// checking for empty commands
 	if args[0] == "" {
-		return 0
+		return nil
 	}
 
 	// checking for built-in commands
-	for i := 0; i < numBuiltins(); i++ {
-		if args[0] == builtInStr[i] {
+	for i, str := range builtInStr {
+		if args[0] == str {
 			function := builtInFuncs[i]
 			return function(args)
 		}
@@ -94,32 +86,27 @@ func execute(args []string) int {
 	return launch(args)
 }
 
-// returns number of built-in commands
-func numBuiltins() int {
-	return len(builtInStr)
-}
-
 // launches non built-in commands
-func launch(args []string) int {
+func launch(args []string) (err error) {
 
 	// starts the command and waits for it to finish
 	if process, err := Start(args); err == nil {
 		process.Wait()
 	}
 
-	return 0
+	return nil
 }
 
-// starts a new process
+/* Start a new process */
 func Start(args []string) (process *os.Process, err error) {
 
-	// checking for command existence
+	/* Check if command exists */
 	if args[0], err = exec.LookPath(args[0]); err == nil {
 
-		// starting the new process
-		process, err := os.StartProcess(args[0], args, &os.ProcAttr{
-			Files: []*os.File{os.Stdin, os.Stdout, os.Stderr},
-		})
+		/* Start the new process */
+		process, err := os.StartProcess(args[0], args, &os.ProcAttr{ 
+			Files: []*os.File{os.Stdin, os.Stdout, os.Stderr}, 
+		}) 
 
 		if err == nil {
 			return process, nil
@@ -137,46 +124,38 @@ func Start(args []string) (process *os.Process, err error) {
 */
 
 // built-in cd command
-func cd(args []string) int {
+func cd(args []string) (err error) {
 
-	// checking for bad args
-	if args[1] == "" {
-		Println("gsh: expected argument to \"cd\"")
-		return 1
-	} else {
-
-		// "~" shortcut to /home/user directory
-		if args[1] == "~" {
-			if homeDir, err := os.UserHomeDir(); err == nil {
-				args[1] = homeDir
-			}
+	// "~" shortcut to /home/user directory
+	if args[1] == "~" || args[1] == "" {
+		if homeDir, err := os.UserHomeDir(); err == nil {
+			args[1] = homeDir
 		}
-
-		// making system call
-		os.Chdir(args[1])
 	}
 
-	return 0
+	os.Chdir(args[1])
+
+	return nil
 }
 
 // built-in help command
-func help(args []string) int {
+func help(args []string) (err error) {
 
 	Print("goshell: simple shell written in go\n" +
 		  "Type program names and arguments, and hit enter\n" +
 		  "\nThe following commands are built-in:\n")
 
-	for i := 0; i < numBuiltins(); i++ {
-		Println("\t", builtInStr[i])
+	for _, str := range builtInStr {
+		Println("\t", str)
 	}
 
 	Println("\nUse the man command for informations about other programs.")
-	return 0
+	return nil
 }
 
 // built-in exit command
-func exit(args []string) int {
-	return 1
+func exit(args []string) (err error) {
+	return errors.New("exit")
 }
 
 /*
