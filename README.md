@@ -11,8 +11,8 @@ go build -o goshell shell.go
 
 sudo mv goshell /usr/local/bin
 ```
-I suggest to not use it as it cannot yet interpret quoted text as a single string ;)
+I suggest to not use it as it cannot yet interpret quoted text as a single string
 
 Edit: now it can
 
-Edit: maybe, it's not really tested
+Edit: maybe, it's not really tested ;)
